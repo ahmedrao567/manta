@@ -9,6 +9,7 @@ import ProfilePage from "./ProfilePage";
 import NFTMarketplace from "./NFTMarketplace";
 import Notifications from "./Notifications";
 import Explore from "./Explore";
+import StaticHomeFeed from "./StaticHomeFeed"; // Assuming this is the correct path
 
 const HomePageContent = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -38,7 +39,7 @@ const HomePageContent = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          {["profile", "nft-marketplace", "notifications", "explore"].map(
+          {["home", "profile", "nft-marketplace", "notifications", "explore"].map(
             (tab) => (
               <button
                 key={tab}
@@ -60,6 +61,8 @@ const HomePageContent = () => {
 
       {/* Main Content Area */}
       <div className="flex-1 p-6">
+      
+        {activeTab === "home" && <StaticHomeFeed />}
         {activeTab === "profile" && <ProfilePage />}
         {activeTab === "nft-marketplace" && <NFTMarketplace />}
         {activeTab === "notifications" && <Notifications />}
