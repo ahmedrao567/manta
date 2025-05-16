@@ -34,9 +34,9 @@ function LoginModal({ closeModal, openSignup }) {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       closeModal();
-        console.log(process.cwd()); 
+        
       router.push('/HomePage');
-      console.log(process.cwd());
+     
        // Redirect to profile page on successful login
     } catch (err) {
       setError(getFirebaseError(err.code)); 

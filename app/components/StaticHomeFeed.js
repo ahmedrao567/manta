@@ -1,54 +1,62 @@
-"use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { db } from "../Authentication/Firebase";
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+} from "firebase/firestore";
 
-const dummyPosts = [
-  {
-    id: 1,
-    username: "you",
-    content: "This is your post!",
-    timestamp: "2025-05-05 10:00 AM",
-    imageUrl: "https://via.placeholder.com/400",
-  },
-  {
-    id: 2,
-    username: "friend1",
-    content: "Hey there! This is a post by your friend.",
-    timestamp: "2025-05-04 03:45 PM",
-    imageUrl: null,
-  },
-  {
-    id: 3,
-    username: "friend2",
-    content: "Beautiful sunset today 🌇",
-    timestamp: "2025-05-03 07:30 PM",
-    imageUrl: "https://via.placeholder.com/400x200",
-  },
-];
+const HomePage = () => {
+  const [posts, setPosts] = useState([]);
 
-const StaticHomeFeed = () => {
+  // Fetching posts from all users
+  useEffect(() => {
+    const q = query(
+      collection(db, "posts"),
+      orderBy("timestamp", "desc")
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedPosts = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setPosts(fetchedPosts);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <h2 className="text-3xl font-bold mb-6 text-white">Your Feed</h2>
-      <div className="space-y-6">
-        {dummyPosts.map((post) => (
-          <div key={post.id} className="bg-gray-800 p-5 rounded-lg text-white shadow-md">
-            <div className="mb-2 text-sm text-gray-400 flex justify-between">
-              <span>@{post.username}</span>
-              <span>{post.timestamp}</span>
+    <div className="max-w-3xl mx-auto p-6 text-white">
+      <h2 className="text-3xl font-bold mb-6">Home Page</h2>
+
+      {/* All Users' Posts */}
+      <div className="space-y-4">
+        {posts.length > 0 ? (
+          posts.map((post) => (
+            <div
+              key={post.id}
+              className="bg-gray-800 p-4 rounded-xl shadow border border-gray-700"
+            >
+              <p className="font-semibold text-blue-400">
+                {post.name || "Unknown User"}
+              </p>
+              <p>{post.content}</p>
+              <p className="text-sm text-gray-500 mt-2">
+                {post.timestamp?.toDate
+                  ? post.timestamp.toDate().toLocaleString()
+                  : "Just now"}
+              </p>
             </div>
-            <p className="text-lg">{post.content}</p>
-            {post.imageUrl && (
-              <img
-                src={post.imageUrl}
-                alt="Post"
-                className="mt-4 rounded-md max-h-80 object-cover w-full"
-              />
-            )}
-          </div>
-        ))}
+          ))
+        ) : (
+          <p>No posts available.</p>
+        )}
       </div>
     </div>
   );
 };
 
-export default StaticHomeFeed;
+export default HomePage;
